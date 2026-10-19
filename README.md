@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # HƯỚNG DẪN SỬ DỤNG & ĐƯA LÊN GITHUB PAGES
 
 Trang web chúc mừng 20/10 phong cách **Scrollytelling Đêm Lung Linh** dành tặng **Lê Nguyễn Yến Nhi**.
@@ -44,3 +45,6 @@ Toàn bộ nội dung đều nằm ở đầu file `script.js` trong đối tư�
 6. Đợi khoảng 1 - 2 phút, GitHub sẽ cung cấp cho bạn một đường link dạng:
    `https://<tên-tài-khoản-github>.github.io/2010-yen-nhi/`
 7. Mở link trên điện thoại kiểm tra thử và gửi tặng bạn gái nhé! 💕
+=======
+# 20-10LNYN
+>>>>>>> 270ce9c6c900485fbe33c6db5dff99060e7a43bc
