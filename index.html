@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gửi Lê Nguyễn Yến Nhi · 20/10 Đặc Biệt</title>
+  <!-- Google Fonts: Space Mono & Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Thanh tiến trình gradient ở trên cùng -->
+  <div class="progress-bar-container">
+    <div id="progress-bar" class="progress-bar"></div>
+  </div>
+
+  <!-- Nút bật/tắt âm thanh -->
+  <button id="audio-toggle" class="audio-btn" aria-label="Bật/Tắt âm thanh" title="Bật/Tắt âm thanh">
+    <svg id="icon-sound-on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    </svg>
+    <svg id="icon-sound-off" class="hidden" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
+    </svg>
+  </button>
+
+  <!-- Thẻ audio phát nhạc nền (người dùng tự thêm music.mp3) -->
+  <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
+
+  <!-- Canvas nền: sao nhấp nháy, cánh hoa rơi và pháo hoa -->
+  <canvas id="stars-canvas"></canvas>
+  <canvas id="petals-canvas"></canvas>
+  <canvas id="fireworks-canvas"></canvas>
+
+  <!-- Khung cảnh chính chứa nhân vật và nội dung -->
+  <main id="app-container" class="app-container">
+
+    <!-- Cảnh 1: Màn mở đầu (Bông hoa sen/tulip phát sáng giữa màn hình) -->
+    <section id="scene-intro" class="scene active">
+      <div class="intro-content">
+        <div class="intro-flower-wrapper">
+          <svg class="intro-flower" viewBox="0 0 100 130" fill="none">
+            <defs>
+              <filter id="flower-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <linearGradient id="petal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff9ec7" />
+                <stop offset="100%" stop-color="#f43f8e" />
+              </linearGradient>
+            </defs>
+            <!-- Thân và lá hoa -->
+            <path d="M50 72 Q50 110 50 118" stroke="#38ef7d" stroke-width="4" stroke-linecap="round"/>
+            <path d="M50 92 Q34 85 30 76 Q42 74 50 86" fill="#2ed573" opacity="0.95"/>
+            <!-- Cánh hoa sen/tulip phát sáng -->
+            <g filter="url(#flower-glow)">
+              <path d="M50 20 C42 35 34 56 42 70 C46 76 54 76 58 70 C66 56 58 35 50 20 Z" fill="url(#petal-grad)"/>
+              <path d="M50 24 C38 42 22 55 33 69 C40 78 48 74 48 68 C45 52 47 38 50 24 Z" fill="#ff758c" opacity="0.85"/>
+              <path d="M50 24 C62 42 78 55 67 69 C60 78 52 74 52 68 C55 52 53 38 50 24 Z" fill="#ff8da1" opacity="0.85"/>
+            </g>
+          </svg>
+        </div>
+        <h1 class="intro-title">Có một món quà nhỏ<br>cho ngày 20/10</h1>
+        <p class="intro-tap">chạm để mở quà</p>
+        <p class="intro-hint">bật âm thanh để nghe trọn vẹn nhé</p>
+      </div>
+    </section>
+
+    <!-- Nhân vật mầm cây SVG tương tác chung -->
+    <div id="character-container" class="character-wrapper pos-center hidden">
+      <div class="character-halo"></div>
+      <div class="character-float">
+        <svg id="character-svg" class="cat-character" viewBox="0 0 180 190" fill="none" style="overflow:visible">
+          <defs>
+            <filter id="cat-neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ff3377" flood-opacity="0.8" />
+              <feDropShadow dx="0" dy="0" stdDeviation="14" flood-color="#ff79b0" flood-opacity="0.5" />
+            </filter>
+            <linearGradient id="cat-body-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(75, 25, 60, 0.65)" />
+              <stop offset="100%" stop-color="rgba(50, 15, 40, 0.6)" />
+            </linearGradient>
+            <radialGradient id="cat-eye-grad" cx="50%" cy="38%" r="60%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="40%" stop-color="#ff9bc2" />
+              <stop offset="100%" stop-color="#ff2a74" />
+            </radialGradient>
+          </defs>
+
+          <!-- Chiếc đuôi cong vẫy nhẹ phía sau -->
+          <g class="cat-tail-group">
+            <path id="cat-tail" d="M136 142 C165 140 178 118 168 95 C164 85 152 86 154 94 C158 106 150 124 130 128" 
+                  stroke="#ff3377" stroke-width="3.5" stroke-linecap="round" fill="none" filter="url(#cat-neon-glow)"/>
+          </g>
+
+          <!-- Hai tai mèo tam giác có phần trong tai hồng nhạt -->
+          <g class="cat-ears-group">
+            <!-- Tai trái -->
+            <g class="cat-ear-left">
+              <path d="M46 54 C40 38 32 20 28 14 C38 18 58 32 68 40 Z" 
+                    fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="3.5" stroke-linejoin="round" filter="url(#cat-neon-glow)"/>
+              <!-- Trong tai trái hồng nhạt -->
+              <path d="M44 48 C40 36 36 24 34 20 C40 24 52 34 58 38 Z" fill="#ff99bb" opacity="0.8"/>
+            </g>
+            <!-- Tai phải -->
+            <g class="cat-ear-right">
+              <path d="M112 40 C122 32 142 18 152 14 C148 20 140 38 134 54 Z" 
+                    fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="3.5" stroke-linejoin="round" filter="url(#cat-neon-glow)"/>
+              <!-- Trong tai phải hồng nhạt -->
+              <path d="M122 38 C128 34 140 24 146 20 C144 24 140 36 136 48 Z" fill="#ff99bb" opacity="0.8"/>
+            </g>
+          </g>
+
+          <!-- Thân và đầu chú mèo béo tròn mềm mại -->
+          <g filter="url(#cat-neon-glow)">
+            <!-- Thân mèo phía dưới -->
+            <path id="cat-body" d="M48 112 
+                     C32 128 28 155 35 168 
+                     C45 174 135 174 145 168 
+                     C152 155 148 128 132 112 Z" 
+                  fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="3.5" stroke-linejoin="round"/>
+
+            <!-- Đầu mèo tròn múp míp -->
+            <ellipse id="cat-head" cx="90" cy="84" rx="54" ry="46" 
+                     fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="3.5"/>
+
+            <!-- Hai bàn chân trước xinh xắn -->
+            <ellipse cx="68" cy="168" rx="10" ry="6" fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="2.5"/>
+            <ellipse cx="112" cy="168" rx="10" ry="6" fill="url(#cat-body-grad)" stroke="#ff3377" stroke-width="2.5"/>
+          </g>
+
+          <!-- Hai bên má hồng phơn phớt -->
+          <ellipse cx="54" cy="98" rx="9" ry="5" fill="#ff4081" opacity="0.75" />
+          <ellipse cx="126" cy="98" rx="9" ry="5" fill="#ff4081" opacity="0.75" />
+
+          <!-- Mũi nhỏ hình tam giác ngược màu hồng -->
+          <polygon points="87,93 93,93 90,97" fill="#ff6699" filter="drop-shadow(0 0 3px #ff3377)"/>
+
+          <!-- Miệng hình chữ "ω" nhỏ cực đáng yêu -->
+          <path id="cat-mouth-w" d="M83 99 Q87 104 90 100 Q93 104 97 99" 
+                stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+          <!-- 3 sợi râu mỗi bên mảnh mai phát sáng -->
+          <g stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.85">
+            <!-- Râu trái -->
+            <line x1="44" y1="88" x2="16" y2="84" />
+            <line x1="42" y1="96" x2="14" y2="96" />
+            <line x1="44" y1="104" x2="18" y2="108" />
+            <!-- Râu phải -->
+            <line x1="136" y1="88" x2="164" y2="84" />
+            <line x1="138" y1="96" x2="166" y2="96" />
+            <line x1="136" y1="104" x2="162" y2="108" />
+          </g>
+
+          <!-- ================= CÁC BIỂU CẢM MÈO ================= -->
+          <!-- 1. Mắt mở to tròn long lanh bình thường -->
+          <g id="face-normal" class="face-expression">
+            <!-- Mắt trái -->
+            <ellipse cx="64" cy="78" rx="9.5" ry="14" fill="url(#cat-eye-grad)" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <circle cx="61" cy="73" r="3.4" fill="#ffffff" />
+            <circle cx="67" cy="83" r="1.6" fill="#ffffff" />
+            <!-- Mắt phải -->
+            <ellipse cx="116" cy="78" rx="9.5" ry="14" fill="url(#cat-eye-grad)" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <circle cx="113" cy="73" r="3.4" fill="#ffffff" />
+            <circle cx="119" cy="83" r="1.6" fill="#ffffff" />
+          </g>
+
+          <!-- 2. Cười tít mắt nhắm lại (^ ^) -->
+          <g id="face-happy" class="face-expression hidden">
+            <!-- Mắt trái cười cong tít -->
+            <path d="M54 80 Q64 66 74 80" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <!-- Mắt phải cười cong tít -->
+            <path d="M106 80 Q116 66 126 80" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <!-- Miệng cười mở xinh -->
+            <path d="M83 99 Q90 108 97 99 Z" fill="#ff4081" stroke="#ffffff" stroke-width="1.8"/>
+          </g>
+
+          <!-- 3. Ngạc nhiên, mắt tròn to hơn, miệng chữ o -->
+          <g id="face-curious" class="face-expression hidden">
+            <ellipse cx="64" cy="76" rx="9.5" ry="13.5" fill="url(#cat-eye-grad)" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <circle cx="62" cy="71" r="3.5" fill="#ffffff" />
+            <ellipse cx="116" cy="76" rx="9.5" ry="13.5" fill="url(#cat-eye-grad)" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <circle cx="114" cy="71" r="3.5" fill="#ffffff" />
+            <circle cx="90" cy="103" r="3.5" fill="#ffffff" />
+          </g>
+
+          <!-- 4. Nháy mắt tinh nghịch (Wink) kèm sao vàng lấp lánh -->
+          <g id="face-wink" class="face-expression hidden">
+            <!-- Mắt trái mở to -->
+            <ellipse cx="64" cy="78" rx="9.5" ry="14" fill="url(#cat-eye-grad)" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <circle cx="61" cy="73" r="3.5" fill="#ffffff" />
+            <!-- Mắt phải nháy cong -->
+            <path d="M106 80 Q116 66 126 80" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" fill="none" filter="drop-shadow(0 0 6px #ff758c)"/>
+            <!-- Ngôi sao vàng 4 cánh lấp lánh ở đuôi mắt phải -->
+            <path d="M136 74 Q140 74 140 70 Q140 74 144 74 Q140 74 140 78 Q140 74 136 74 Z" fill="#ffd000" filter="drop-shadow(0 0 7px #ffe600)"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Khu vực nội dung các cảnh động (khi nhân vật đứng ở trái hoặc giữa) -->
+    <div id="stage-content" class="stage-content hidden">
+
+      <!-- Cảnh 3: Chữ lớn 20/10 NGÀY PHỤ NỮ VIỆT NAM -->
+      <div id="scene-banner-2010" class="scene-subview hidden">
+        <div class="banner-box">
+          <div class="big-date-gradient">20/10</div>
+          <div class="sub-date-title">NGÀY PHỤ NỮ VIỆT NAM</div>
+        </div>
+      </div>
+
+      <!-- Cảnh 4: Cột mốc 2006 · 20 năm của Yến Nhi -->
+      <div id="scene-milestone" class="scene-subview hidden">
+        <div class="milestone-box">
+          <div class="milestone-year">2006</div>
+          <div class="milestone-desc">18 tháng 6 · một cô gái nhỏ chào đời tại Thành phố Hồ Chí Minh</div>
+          
+          <div class="milestone-timeline">
+            <span class="timeline-point">2006</span>
+            <div class="timeline-bar">
+              <div class="timeline-progress"></div>
+            </div>
+            <span class="timeline-point">nay</span>
+          </div>
+
+          <div class="milestone-highlight">
+            <span class="highlight-num">20</span> năm của em, và là 20 năm thế giới có thêm một người thật đặc biệt
+          </div>
+        </div>
+      </div>
+
+      <!-- Cảnh 5: Chòm sao Yến Nhi -->
+      <div id="scene-constellation" class="scene-subview hidden">
+        <div class="constellation-box">
+          <div class="constellation-title">CHÒM SAO CỦA ANH</div>
+          <div class="constellation-svg-wrapper">
+            <svg id="constellation-svg" viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet">
+              <!-- Các đường nối giữa các vì sao -->
+              <g class="constellation-lines" stroke="rgba(255, 64, 129, 0.45)" stroke-width="1.8" stroke-dasharray="4,4">
+                <line x1="60" y1="180" x2="160" y2="80" />
+                <line x1="160" y1="80" x2="270" y2="140" />
+                <line x1="270" y1="140" x2="350" y2="60" />
+                <line x1="350" y1="60" x2="420" y2="170" />
+              </g>
+              <!-- Các ngôi sao vệ tinh -->
+              <g class="star-nodes">
+                <!-- Node 1 -->
+                <g class="star-node" transform="translate(60, 180)">
+                  <circle r="5" fill="#00f2fe" filter="drop-shadow(0 0 6px #00f2fe)"/>
+                  <text x="0" y="24" text-anchor="middle" class="star-label">Thành phố Hồ Chí Minh</text>
+                </g>
+                <!-- Node 2 -->
+                <g class="star-node" transform="translate(160, 80)">
+                  <circle r="5" fill="#ff79b0" filter="drop-shadow(0 0 6px #ff79b0)"/>
+                  <text x="0" y="-14" text-anchor="middle" class="star-label">Lê Nguyễn Yến Nhi · 18/06/2006</text>
+                </g>
+                <!-- Node 3 -->
+                <g class="star-node" transform="translate(270, 140)">
+                  <circle r="5" fill="#00f2fe" filter="drop-shadow(0 0 6px #00f2fe)"/>
+                  <text x="0" y="24" text-anchor="middle" class="star-label">Cô gái của anh</text>
+                </g>
+                <!-- Node 4 -->
+                <g class="star-node" transform="translate(350, 60)">
+                  <circle r="5" fill="#ff79b0" filter="drop-shadow(0 0 6px #ff79b0)"/>
+                  <text x="0" y="-14" text-anchor="middle" class="star-label">Nụ cười toả nắng</text>
+                </g>
+                <!-- Node 5: Ngôi sao sáng nhất (To nhất, màu vàng) -->
+                <g class="star-node brightest-star" transform="translate(420, 170)">
+                  <circle r="9" fill="#ffd000" filter="drop-shadow(0 0 14px #ffe600)"/>
+                  <polygon points="0,-12 3,-3 12,0 3,3 0,12 -3,3 -12,0 -3,-3" fill="#ffffff" opacity="0.9"/>
+                  <text x="0" y="32" text-anchor="middle" class="star-label star-highlight">và em là ngôi sao sáng nhất</text>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cảnh 6: 4 Thẻ điều đáng yêu về em -->
+      <div id="scene-traits" class="scene-subview hidden">
+        <div class="traits-container" id="traits-list">
+          <!-- Dynamic cards sẽ được render từ script.js -->
+        </div>
+      </div>
+
+      <!-- Cảnh 7: Lời chúc 1 - Sức khỏe (Trái tim & Nhịp tim neon) -->
+      <div id="scene-wish-health" class="scene-subview hidden">
+        <div class="health-box">
+          <div class="heart-pulse-wrapper">
+            <svg class="beating-heart-svg" viewBox="0 0 120 120">
+              <defs>
+                <filter id="heart-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#ff2a74" flood-opacity="0.9"/>
+                </filter>
+              </defs>
+              <path filter="url(#heart-glow)" d="M60 100 C20 70 5 45 15 25 C25 5 50 10 60 30 C70 10 95 5 105 25 C115 45 100 70 60 100 Z" fill="url(#petal-grad)"/>
+            </svg>
+          </div>
+          <!-- Đường điện tim ECG neon chạy liên tục -->
+          <div class="ecg-line-container">
+            <svg class="ecg-svg" viewBox="0 0 500 80" preserveAspectRatio="none">
+              <path class="ecg-path" d="M0,40 L120,40 L135,20 L150,60 L165,10 L180,70 L195,35 L210,40 L320,40 L335,20 L350,60 L365,10 L380,70 L395,35 L410,40 L500,40" fill="none" stroke="#00f2fe" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="wish-label">THẬT NHIỀU SỨC KHỎE</div>
+        </div>
+      </div>
+
+      <!-- Cảnh 8: Lời chúc 2 - Bình yên (Mặt trăng tròn & Sen nở) -->
+      <div id="scene-wish-peace" class="scene-subview hidden">
+        <div class="peace-box">
+          <div class="moon-wrapper">
+            <div class="glowing-moon"></div>
+          </div>
+          <div class="lake-lotus-wrapper">
+            <svg class="lake-lotus-svg" viewBox="0 0 200 120">
+              <!-- Sóng nước mờ lăn tăn -->
+              <ellipse cx="100" cy="100" rx="85" ry="12" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="1.5" />
+              <ellipse cx="100" cy="102" rx="55" ry="7" fill="none" stroke="rgba(255, 64, 129, 0.35)" stroke-width="1.2" />
+              <!-- Hoa sen nở an yên -->
+              <g filter="url(#flower-glow)">
+                <path d="M100 48 C90 62 82 82 90 94 C94 100 106 100 110 94 C118 82 110 62 100 48 Z" fill="#ff79b0"/>
+                <path d="M100 52 C86 70 70 82 80 94 C88 102 96 98 96 92 C92 78 96 64 100 52 Z" fill="#ff5388" opacity="0.9"/>
+                <path d="M100 52 C114 70 130 82 120 94 C112 102 104 98 104 92 C108 78 104 64 100 52 Z" fill="#ff9ebb" opacity="0.9"/>
+              </g>
+              <!-- Lá sen tròn mướt xanh -->
+              <ellipse cx="65" cy="104" rx="28" ry="6" fill="#1b5e20" opacity="0.8"/>
+              <ellipse cx="138" cy="104" rx="25" ry="5.5" fill="#1b5e20" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="wish-label">BÌNH YÊN & AN NHIÊN</div>
+        </div>
+      </div>
+
+      <!-- Cảnh 8.5: Câu hỏi tương tác - Khen bản thân (như ảnh chụp màn hình 3) -->
+      <div id="scene-question" class="scene-subview hidden">
+        <div class="question-box">
+          <div class="question-buttons">
+            <button id="btn-answer-yes" class="btn-q btn-q-yes">rồi nè ✿</button>
+            <button id="btn-answer-no" class="btn-q btn-q-no">chưa nữa…</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cảnh 9: Màn kết - Thiệp chúc mừng & Nút tương tác -->
+      <div id="scene-finale" class="scene-subview hidden">
+        <div class="finale-card">
+          <div class="card-glow-border"></div>
+          <div class="card-inner">
+            <span class="finale-badge">CHÚC MỪNG NGÀY</span>
+            <h2 class="finale-title">Phụ nữ Việt Nam</h2>
+            <div class="finale-date">20 · 10</div>
+            <p class="finale-to">gửi người phụ nữ tuyệt vời của anh</p>
+            <div class="finale-letter" id="finale-letter-text">
+              <!-- Chữ thư chúc cá nhân được tải từ CONFIG -->
+            </div>
+            
+            <div class="finale-actions">
+              <button id="btn-copy-link" class="btn-action btn-copy">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="copy-btn-text">Chép link</span>
+              </button>
+              <button id="btn-replay" class="btn-action btn-replay">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                <span>Xem lại</span>
+              </button>
+            </div>
+            <div id="copy-toast" class="copy-toast hidden">Đã chép link gửi em rồi nè! 💕</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Khu vực phụ đề hiển thị kiểu máy đánh chữ ở dưới đáy -->
+  <div id="subtitle-box" class="subtitle-box hidden">
+    <p id="subtitle-text" class="subtitle-text"></p>
+  </div>
+
+  <!-- Dòng gợi ý chạm riêng biệt (bottom: 9vh) -->
+  <div id="tap-hint-indicator" class="tap-hint-indicator hidden">
+    <span class="tap-dot"></span>
+    <span class="tap-text">chạm để tiếp tục</span>
+  </div>
+
+  <!-- Thảm cỏ neon động vẽ bằng Canvas + Gradient mờ ở đáy -->
+  <div class="neon-grass-wrapper">
+    <div class="grass-gradient-mask"></div>
+    <canvas id="grass-canvas"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

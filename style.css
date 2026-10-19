@@ -1,0 +1,1362 @@
+/* ========================================================
+   GỬI LÊ NGUYỄN YẾN NHI - 20/10 ĐẶC BIỆT
+   Phong cách Scrollytelling Neon Đêm Lung Linh
+   ======================================================== */
+
+:root {
+  --bg-color: #05020a;
+  --bg-gradient: radial-gradient(circle at 50% 30%, #0e051a 0%, #05020a 80%);
+  --neon-pink: #ff2a74;
+  --neon-pink-glow: rgba(255, 42, 116, 0.6);
+  --neon-cyan: #00f2fe;
+  --neon-cyan-glow: rgba(0, 242, 254, 0.5);
+  --neon-yellow: #ffd000;
+  --neon-yellow-glow: rgba(255, 208, 0, 0.5);
+  --text-white: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.65);
+  --font-mono: 'Space Mono', Consolas, Monaco, 'Courier New', monospace;
+  --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  background: var(--bg-gradient);
+  color: var(--text-white);
+  font-family: var(--font-mono);
+  touch-action: manipulation;
+}
+
+/* ----------------------------------------------------
+   1. THANH TIẾN TRÌNH TRÊN CÙNG
+   ---------------------------------------------------- */
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3.5px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff4081, #ff9100, #ffe57f);
+  box-shadow: 0 0 10px rgba(255, 64, 129, 0.8), 0 0 15px rgba(255, 145, 0, 0.6);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ----------------------------------------------------
+   2. NÚT ÂM THANH
+   ---------------------------------------------------- */
+.audio-btn {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 105;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.audio-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.audio-btn .hidden {
+  display: none !important;
+}
+
+/* ----------------------------------------------------
+   3. CANVAS CÁC HIỆU ỨNG (SAO, HOA RƠI, PHÁO HOA)
+   ---------------------------------------------------- */
+#stars-canvas,
+#petals-canvas,
+#fireworks-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#stars-canvas {
+  z-index: 1;
+}
+
+#petals-canvas {
+  z-index: 5;
+}
+
+#fireworks-canvas {
+  z-index: 6;
+}
+
+/* ----------------------------------------------------
+   4. KHUNG ỨNG DỤNG CHÍNH (APP CONTAINER)
+   ---------------------------------------------------- */
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cảnh 1: Màn mở đầu */
+.scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+  pointer-events: none;
+}
+
+.scene.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.intro-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 20px;
+}
+
+.intro-flower-wrapper {
+  margin-bottom: 28px;
+  animation: intro-float 3.5s ease-in-out infinite;
+}
+
+.intro-flower {
+  width: 88px;
+  height: 114px;
+  filter: drop-shadow(0 0 20px rgba(255, 80, 140, 0.65));
+}
+
+.intro-title {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #ffffff;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 100, 160, 0.4);
+  letter-spacing: 0.5px;
+  margin-bottom: 22px;
+}
+
+.intro-tap {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 2px;
+  animation: pulse-tap 2s ease-in-out infinite;
+  margin-bottom: 50px;
+}
+
+.intro-hint {
+  position: fixed;
+  bottom: 9vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0.6;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ----------------------------------------------------
+   5. NHÂN VẬT MÈO NEON SVG (CHARACTER)
+   ---------------------------------------------------- */
+.character-wrapper {
+  position: absolute;
+  z-index: 20;
+  transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
+  pointer-events: none;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.character-wrapper.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Vị trí ở giữa */
+.character-wrapper.pos-center {
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+}
+
+/* Vị trí dịch sang trái (Desktop) */
+.character-wrapper.pos-left {
+  left: 28%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+}
+
+.character-float {
+  animation: sprout-hover 3.2s ease-in-out infinite;
+  position: relative;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Vầng hào quang tròn mờ nhẹ phía sau */
+.character-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 64, 129, 0.2) 0%, rgba(255, 64, 129, 0.05) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  transition: all 0.8s ease;
+}
+
+.character-wrapper.golden-mode .character-halo {
+  background: radial-gradient(circle, rgba(255, 208, 0, 0.3) 0%, rgba(255, 145, 0, 0.08) 50%, transparent 70%) !important;
+}
+
+.cat-character {
+  width: 175px;
+  height: 185px;
+  overflow: visible !important;
+  filter: drop-shadow(0 0 12px rgba(255, 80, 160, 0.6));
+  transition: all 0.8s ease;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.character-wrapper.golden-mode .cat-character {
+  filter: drop-shadow(0 0 14px rgba(255, 208, 0, 0.75)) !important;
+}
+
+/* Animation vẫy đuôi nhẹ nhàng */
+.cat-tail-group {
+  transform-origin: 130px 135px;
+  animation: tail-wiggle 3.6s ease-in-out infinite;
+}
+
+/* Animation giật nhẹ tai */
+.cat-ear-left {
+  transform-origin: 50px 48px;
+  animation: ear-twitch-left 4.8s ease-in-out infinite;
+}
+
+.cat-ear-right {
+  transform-origin: 130px 48px;
+  animation: ear-twitch-right 5.2s ease-in-out infinite;
+}
+
+@keyframes tail-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes ear-twitch-left {
+  0%, 90%, 100% {
+    transform: rotate(0deg);
+  }
+  93% {
+    transform: rotate(-6deg);
+  }
+  96% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes ear-twitch-right {
+  0%, 88%, 100% {
+    transform: rotate(0deg);
+  }
+  92% {
+    transform: rotate(6deg);
+  }
+  95% {
+    transform: rotate(-2deg);
+  }
+}
+
+/* Biểu cảm khuôn mặt */
+.face-expression {
+  transition: opacity 0.3s ease;
+}
+
+.face-expression.hidden {
+  display: none;
+}
+
+/* ----------------------------------------------------
+   6. KHU VỰC NỘI DUNG SÂN KHẤU (STAGE CONTENT)
+   ---------------------------------------------------- */
+.stage-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.stage-content.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.scene-subview {
+  width: 58%;
+  padding-right: 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: auto;
+}
+
+.scene-subview.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scene-subview.hidden {
+  display: none !important;
+}
+
+/* Cảnh 3: 20/10 NGÀY PHỤ NỮ VIỆT NAM */
+.banner-box {
+  text-align: center;
+}
+
+.big-date-gradient {
+  font-family: var(--font-sans);
+  font-size: 7.2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #ffffff 10%, #ff85a2 45%, #ffd269 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(255, 110, 160, 0.65));
+  margin-bottom: 12px;
+  animation: pulse-date 4s ease-in-out infinite alternate;
+}
+
+.sub-date-title {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 42, 116, 0.4);
+}
+
+/* ----------------------------------------------------
+   CẢNH 4: CỘT MỐC 2006 (MILESTONE)
+   ---------------------------------------------------- */
+.milestone-box {
+  text-align: center;
+  max-width: 580px;
+}
+
+.milestone-year {
+  font-family: var(--font-mono);
+  font-size: 6rem;
+  font-weight: 800;
+  color: #ffe680;
+  text-shadow: 0 0 25px rgba(255, 220, 100, 0.7), 0 0 45px rgba(255, 180, 0, 0.4);
+  letter-spacing: 2px;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+
+.milestone-desc {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  margin-bottom: 22px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.milestone-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 18px 0 24px;
+}
+
+.timeline-point {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffd000;
+  letter-spacing: 1px;
+}
+
+.timeline-bar {
+  flex: 1;
+  max-width: 260px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-progress {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff4081, #ffd000);
+  box-shadow: 0 0 10px #ff4081;
+}
+
+.milestone-highlight {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.milestone-highlight .highlight-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ff2a74;
+  text-shadow: 0 0 15px rgba(255, 42, 116, 0.8);
+  margin-right: 4px;
+}
+
+/* ----------------------------------------------------
+   CẢNH 5: CHÒM SAO (CONSTELLATION)
+   ---------------------------------------------------- */
+.constellation-box {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
+
+.constellation-title {
+  font-size: 0.9rem;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+}
+
+.constellation-svg-wrapper {
+  width: 100%;
+  height: auto;
+}
+
+#constellation-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.star-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: rgba(255, 255, 255, 0.85);
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+}
+
+.star-highlight {
+  font-size: 13px;
+  font-weight: bold;
+  fill: #ffd000 !important;
+  filter: drop-shadow(0 0 8px rgba(255, 208, 0, 0.8));
+}
+
+.brightest-star polygon {
+  animation: star-spin 8s linear infinite;
+  transform-origin: 0 0;
+}
+
+@keyframes star-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ----------------------------------------------------
+   CẢNH 6: 4 THẺ ĐIỀU ĐÁNG YÊU (TRAITS)
+   ---------------------------------------------------- */
+.traits-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 580px;
+}
+
+.trait-card {
+  background: rgba(255, 42, 116, 0.05);
+  border: 1px solid rgba(255, 64, 129, 0.35);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(255, 64, 129, 0.1);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.trait-card.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.trait-card:hover {
+  border-color: rgba(255, 64, 129, 0.7);
+  box-shadow: 0 0 18px rgba(255, 42, 116, 0.35);
+}
+
+.trait-icon {
+  font-size: 1.6rem;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px rgba(255, 100, 160, 0.5));
+}
+
+.trait-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+/* ----------------------------------------------------
+   CẢNH 7: LỜI CHÚC SỨC KHỎE (HEALTH & ECG)
+   ---------------------------------------------------- */
+.health-box {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heart-pulse-wrapper {
+  margin-bottom: 20px;
+}
+
+.beating-heart-svg {
+  width: 90px;
+  height: 90px;
+  animation: heart-beat 1.2s ease-in-out infinite;
+}
+
+.ecg-line-container {
+  width: 320px;
+  height: 60px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.ecg-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ecg-path {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: ecg-flow 2.2s linear infinite;
+  filter: drop-shadow(0 0 8px #00f2fe);
+}
+
+@keyframes heart-beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.18);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes ecg-flow {
+  0% {
+    stroke-dashoffset: 600;
+  }
+  100% {
+    stroke-dashoffset: -600;
+  }
+}
+
+.wish-label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #00f2fe;
+  text-shadow: 0 0 12px rgba(0, 242, 254, 0.7);
+}
+
+/* ----------------------------------------------------
+   CẢNH 8: LỜI CHÚC BÌNH YÊN (MOON & LAKE LOTUS)
+   ---------------------------------------------------- */
+.peace-box {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.moon-wrapper {
+  margin-bottom: 12px;
+}
+
+.glowing-moon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff6d0 50%, #fbd561 90%);
+  box-shadow: 0 0 25px rgba(255, 230, 150, 0.8), 0 0 60px rgba(255, 215, 0, 0.4);
+  animation: moon-glow 4s ease-in-out infinite alternate;
+}
+
+.lake-lotus-wrapper {
+  margin-bottom: 14px;
+}
+
+.lake-lotus-svg {
+  width: 180px;
+  height: 108px;
+}
+
+@keyframes moon-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 230, 150, 0.7), 0 0 45px rgba(255, 215, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 35px rgba(255, 230, 150, 0.95), 0 0 75px rgba(255, 215, 0, 0.55);
+  }
+}
+
+/* ----------------------------------------------------
+   CẢNH CÂU HỎI TƯƠNG TÁC (KHEN BẢN THÂN)
+   ---------------------------------------------------- */
+.question-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.question-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.btn-q {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: rgba(18, 5, 26, 0.7);
+  color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.btn-q-yes {
+  border: 1.5px solid rgba(255, 64, 129, 0.7);
+  box-shadow: 0 0 15px rgba(255, 64, 129, 0.25), inset 0 0 10px rgba(255, 64, 129, 0.1);
+}
+
+.btn-q-yes:hover {
+  border-color: #ff4081;
+  background: rgba(255, 64, 129, 0.2);
+  box-shadow: 0 0 25px rgba(255, 64, 129, 0.6);
+  transform: translateY(-3px) scale(1.05);
+}
+
+.btn-q-no {
+  border: 1.5px solid rgba(138, 92, 246, 0.6);
+  box-shadow: 0 0 15px rgba(138, 92, 246, 0.2), inset 0 0 10px rgba(138, 92, 246, 0.1);
+}
+
+.btn-q-no:hover {
+  border-color: #a78bfa;
+  background: rgba(138, 92, 246, 0.2);
+  box-shadow: 0 0 25px rgba(138, 92, 246, 0.6);
+  transform: translateY(-3px) scale(1.05);
+}
+
+/* ----------------------------------------------------
+   CẢNH 9: MÀN KẾT (FINALE CARD)
+   ---------------------------------------------------- */
+.finale-card {
+  position: relative;
+  max-width: 540px;
+  width: 100%;
+  border-radius: 20px;
+  padding: 2px;
+  background: linear-gradient(135deg, #ff4081, #ffd000, #00f2fe);
+  box-shadow: 0 0 30px rgba(255, 64, 129, 0.4), 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.card-inner {
+  background: #0d0617;
+  border-radius: 18px;
+  padding: 26px 28px;
+  text-align: center;
+  position: relative;
+}
+
+.finale-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(255, 64, 129, 0.15);
+  color: #ff79b0;
+  border: 1px solid rgba(255, 64, 129, 0.3);
+  margin-bottom: 12px;
+}
+
+.finale-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 25px rgba(255, 64, 129, 0.4);
+  margin-bottom: 4px;
+}
+
+.finale-date {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #ffd000;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 208, 0, 0.5);
+}
+
+.finale-to {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 16px;
+}
+
+.finale-letter {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: justify;
+  margin-bottom: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 3px solid #ff4081;
+}
+
+.finale-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.btn-action {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-copy {
+  background: linear-gradient(135deg, #ff4081, #ff6b6b);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 64, 129, 0.4);
+}
+
+.btn-copy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(255, 64, 129, 0.7);
+}
+
+.btn-replay {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-replay:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.copy-toast {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2ed573;
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: fadeInOut 2.5s forwards;
+}
+
+.copy-toast.hidden {
+  display: none !important;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, 8px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -8px); }
+}
+
+/* Biến đổi chú mèo sang màu vàng rực rỡ ở màn kết (Golden mode) */
+.character-wrapper.golden-mode #cat-body,
+.character-wrapper.golden-mode #cat-head,
+.character-wrapper.golden-mode #cat-tail,
+.character-wrapper.golden-mode .cat-ear-left path,
+.character-wrapper.golden-mode .cat-ear-right path {
+  stroke: #ffd000 !important;
+  filter: drop-shadow(0 0 8px rgba(255, 208, 0, 0.85)) drop-shadow(0 0 16px rgba(255, 145, 0, 0.6)) !important;
+}
+
+/* ----------------------------------------------------
+   7. PHỤ ĐỀ TYPEWRITER Ở ĐÁY
+   ---------------------------------------------------- */
+/* ----------------------------------------------------
+   7. PHỤ ĐỀ TYPEWRITER Ở ĐÁY
+   ---------------------------------------------------- */
+.subtitle-box {
+  position: fixed;
+  bottom: 14vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 820px;
+  text-align: center;
+  z-index: 30;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.subtitle-box.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.subtitle-text {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  line-height: 1.6;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.65), 0 2px 6px rgba(0, 0, 0, 0.8);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Từ khóa nhấn mạnh màu hồng */
+.subtitle-text .highlight {
+  color: #ff3377;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 51, 119, 0.8), 0 0 24px rgba(255, 51, 119, 0.5);
+  margin: 0 4px;
+}
+
+/* Con trỏ gõ chữ */
+.typewriter-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.25em;
+  background-color: #ff3377;
+  margin-left: 4px;
+  vertical-align: middle;
+  box-shadow: 0 0 8px #ff3377;
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+/* Gợi ý chạm màn hình ("chạm để tiếp tục") */
+.tap-hint-indicator {
+  position: fixed;
+  bottom: 9vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  z-index: 30;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.tap-hint-indicator.hidden {
+  display: none !important;
+}
+
+.tap-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ff508c;
+  animation: pulse-dot 1.5s infinite;
+}
+
+.tap-text {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* ----------------------------------------------------
+   8. THẢM CỎ NEON CANVAS ĐỘNG Ở ĐÁY & GRADIENT MỜ
+   ---------------------------------------------------- */
+.neon-grass-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 12vh;
+  min-height: 80px;
+  max-height: 110px;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.grass-gradient-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.35) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+#grass-canvas {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ----------------------------------------------------
+   9. CÁC KEYFRAMES ANIMATION
+   ---------------------------------------------------- */
+@keyframes intro-float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.03);
+  }
+}
+
+@keyframes sprout-hover {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pulse-tap {
+  0%, 100% {
+    opacity: 0.45;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pulse-date {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(255, 110, 160, 0.5));
+  }
+  100% {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 32px rgba(255, 110, 160, 0.8));
+  }
+}
+
+@keyframes cursor-blink {
+  from, to {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
+@keyframes sway-1 {
+  0% {
+    transform: skewX(-3deg);
+  }
+  100% {
+    transform: skewX(3deg);
+  }
+}
+
+@keyframes sway-2 {
+  0% {
+    transform: skewX(2.5deg);
+  }
+  100% {
+    transform: skewX(-2.5deg);
+  }
+}
+
+@keyframes sway-3 {
+  0% {
+    transform: skewX(-1.5deg);
+  }
+  100% {
+    transform: skewX(2deg);
+  }
+}
+
+/* ----------------------------------------------------
+   10. RESPONSIVE CHO ĐIỆN THOẠI (PORTRAIT MOBILE)
+   ---------------------------------------------------- */
+@media (max-width: 768px) {
+  .intro-title {
+    font-size: 1.6rem;
+    line-height: 1.4;
+  }
+
+  .intro-tap {
+    font-size: 0.95rem;
+  }
+
+  /* Trên điện thoại: nhân vật ở trên cao, nội dung ở dưới */
+  .character-wrapper.pos-center {
+    top: 32%;
+    left: 50%;
+  }
+
+  .character-wrapper.pos-left {
+    top: 24%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cat-character {
+    width: 140px;
+    height: 150px;
+  }
+
+  .stage-content {
+    justify-content: center;
+    align-items: center;
+    top: 29%;
+    bottom: 22vh;
+    height: auto;
+  }
+
+  .scene-subview {
+    width: 90%;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .big-date-gradient {
+    font-size: 4.2rem;
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+  }
+
+  .sub-date-title {
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+  }
+
+  .subtitle-text {
+    font-size: 1.05rem;
+    min-height: 44px;
+  }
+
+  .neon-grass-container {
+    height: 60px;
+  }
+
+  /* Responsive cảnh 4: Cột mốc 2006 */
+  .milestone-year {
+    font-size: 3.8rem;
+    margin-bottom: 6px;
+  }
+  .milestone-desc {
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+  }
+  .milestone-timeline {
+    margin: 10px 0 14px;
+  }
+  .timeline-bar {
+    max-width: 170px;
+  }
+  .milestone-highlight {
+    font-size: 0.95rem;
+  }
+  .milestone-highlight .highlight-num {
+    font-size: 1.7rem;
+  }
+
+  /* Responsive cảnh 5: Chòm sao */
+  .constellation-box {
+    max-width: 95%;
+  }
+  .star-label {
+    font-size: 9.5px;
+  }
+  .star-highlight {
+    font-size: 11px;
+  }
+
+  /* Responsive cảnh 6: 4 Thẻ */
+  .traits-container {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-width: 95%;
+  }
+  .trait-card {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+  .trait-icon {
+    font-size: 1.3rem;
+    min-width: 30px;
+    height: 30px;
+  }
+  .trait-text {
+    font-size: 0.85rem;
+  }
+
+  /* Responsive cảnh 7: Điện tim & Trái tim */
+  .beating-heart-svg {
+    width: 70px;
+    height: 70px;
+  }
+  .heart-pulse-wrapper {
+    margin-bottom: 10px;
+  }
+  .ecg-line-container {
+    width: 250px;
+    height: 45px;
+    margin-bottom: 10px;
+  }
+  .wish-label {
+    font-size: 0.9rem;
+    letter-spacing: 2.5px;
+  }
+
+  /* Responsive cảnh 8: Mặt trăng & Sen */
+  .glowing-moon {
+    width: 60px;
+    height: 60px;
+  }
+  .lake-lotus-svg {
+    width: 140px;
+    height: 85px;
+  }
+
+  /* Responsive cảnh câu hỏi */
+  .question-buttons {
+    gap: 10px;
+  }
+  .btn-q {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+
+  /* Responsive cảnh 9: Thiệp kết */
+  .finale-card {
+    max-width: 92% !important;
+    width: 92% !important;
+    margin: 0 auto;
+  }
+  .card-inner {
+    padding: 14px 14px !important;
+  }
+  .finale-title {
+    font-size: 1.45rem !important;
+    margin-bottom: 2px !important;
+  }
+  .finale-date {
+    font-size: 1rem !important;
+    margin-bottom: 4px !important;
+  }
+  .finale-to {
+    font-size: 0.76rem !important;
+    margin-bottom: 8px !important;
+  }
+  .finale-letter {
+    font-size: 0.8rem !important;
+    line-height: 1.45 !important;
+    padding: 8px 10px !important;
+    margin-bottom: 12px !important;
+  }
+  .finale-actions {
+    gap: 8px !important;
+  }
+  .btn-action {
+    font-size: 0.78rem !important;
+    padding: 6px 12px !important;
+  }
+
+  /* Định vị chuẩn xác màn kết trên mobile: cách đáy ít nhất 15vh */
+  body.in-finale .character-wrapper.pos-left {
+    top: 10% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.68) !important;
+  }
+
+  body.in-finale .stage-content {
+    top: 18% !important;
+    bottom: 15vh !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    height: auto !important;
+  }
+
+  .subtitle-box {
+    bottom: 14vh !important;
+    width: 92%;
+  }
+
+  .tap-hint-indicator {
+    bottom: 9vh !important;
+  }
+
+  .neon-grass-wrapper {
+    height: 10vh !important;
+  }
+}
+
